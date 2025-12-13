@@ -17,7 +17,17 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	// ==========================================================
+   // 1. D1 数据库绑定配置
+  // ==========================================================
+	"d1_databases": [
+    {
+      // Worker 代码中引用 D1 数据库的变量名 (env.DB)
+      "binding": "DB",
+      "database_name": "epic_free_games_db",
+      "database_id": "cc398048-aac0-40d1-8388-c13f4b45afb1" // <-- 替换为您实际的 ID！
+    }],
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

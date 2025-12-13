@@ -1,11 +1,76 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Astro 页面的前端部分，无需后端逻辑
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>Epic Games 免费游戏提醒订阅</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        input[type="email"], button { padding: 10px; margin: 8px 0; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+        button { cursor: pointer; color: white; border: none; font-weight: bold; }
+        #subscribeBtn { background-color: #007bff; }
+        #unsubscribeBtn { background-color: #dc3545; }
+        #message { margin-top: 15px; padding: 10px; border-radius: 4px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🎮 Epic Games 免费游戏提醒</h1>
+    <p>输入您的邮箱，我们将在每周四免费游戏更新后发送通知给您。</p>
+
+    <form id="subscriptionForm">
+        <input type="email" id="email" placeholder="您的邮箱地址" required>
+        <button type="submit" id="subscribeBtn" data-action="subscribe">订阅通知</button>
+        <button type="submit" id="unsubscribeBtn" data-action="unsubscribe">退订通知</button>
+    </form>
+    
+    <div id="message"></div>
+
+    <script>
+        // API URL 使用相对路径，因为它与 Pages Functions 部署在同一域名下
+        const API_URL = '/api/subscribe'; 
+        const form = document.getElementById('subscriptionForm');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            // 获取点击的按钮上的 data-action 属性值
+            const action = e.submitter.getAttribute('data-action'); 
+            
+            messageDiv.textContent = '处理中...';
+            messageDiv.style.backgroundColor = '#ffffcc';
+            messageDiv.style.color = '#333';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, action })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.textContent = data.message;
+                    messageDiv.style.backgroundColor = '#d4edda'; // 绿色背景表示成功
+                    messageDiv.style.color = '#155724';
+                } else {
+                    messageDiv.textContent = `操作失败: ${data.error || '未知错误'}`;
+                    messageDiv.style.backgroundColor = '#f8d7da'; // 红色背景表示错误
+                    messageDiv.style.color = '#721c24';
+                }
+
+            } catch (error) {
+                messageDiv.textContent = '网络请求失败，请检查连接。';
+                messageDiv.style.backgroundColor = '#f8d7da';
+                messageDiv.style.color = '#721c24';
+            }
+        });
+    </script>
+</body>
+</html>
