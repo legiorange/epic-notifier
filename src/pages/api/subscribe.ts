@@ -24,6 +24,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (!email || !action) {
             return new Response(JSON.stringify({ error: "邮箱或操作参数缺失。" }), { status: 400, headers });
         }
+    //API: https://email-cheker-2a9.allforone.workers.dev/?email=legiorange@163.com
+    //{"status":"success","email":"legiorange@163.com","valid":true,"message":"Email is valid and domain is allowed."} 
+    //API+wrong email: https://email-cheker-2a9.allforone.workers.dev/?email=legiorange@163.com
+    // {"status":"error","email":"legiorange@63.com","valid":false,"message":"Domain not supported. Only major public email providers are allowed."}
+        const emailCheckResponse = await fetch(`https://email-cheker-2a9.allforone.workers.dev/?email=${email}`);
+        const emailCheckData = await emailCheckResponse.json();
+        
+
+        if (!emailCheckData.valid) {
+            return new Response(JSON.stringify({ error: emailCheckData.message }), { status: 400, headers });
+        }
 
         if (action === 'subscribe') {
             // 插入新邮箱或将已存在的邮箱状态更新为 'active'
